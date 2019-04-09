@@ -208,11 +208,15 @@ spec:
   selector:
     run: teastore-recommender
 ---
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: teastore-webui
 spec:
+  selector:
+    matchLabels:
+      app: teastore
+  serviceName: "teastore-webui"
   template:
     metadata:
       labels:
