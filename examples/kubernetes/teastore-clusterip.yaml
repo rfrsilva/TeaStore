@@ -228,6 +228,9 @@ spec:
         image: descartesresearch/teastore-webui
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            cpu: 850m
         env:
         - name: HOST_NAME
           value: "teastore-webui"
@@ -249,3 +252,4 @@ spec:
     protocol: TCP
   selector:
     run: teastore-webui
+
