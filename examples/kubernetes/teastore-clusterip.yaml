@@ -215,12 +215,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: teastore
+      app: teastore-webui
   serviceName: "teastore-webui"
   template:
     metadata:
       labels:
-        app: teastore
+        app: teastore-webui
         run: teastore-webui
     spec:
       containers:
@@ -242,7 +242,7 @@ kind: Service
 metadata:
   name: teastore-webui
   labels:
-    app: teastore
+    app: teastore-webui
     run: teastore-webui
 spec:
   type: NodePort
