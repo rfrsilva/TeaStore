@@ -8,58 +8,60 @@ from tmalibrary.probes import *
 import subprocess
 
 def create_message():
-	# the timestamp is the same for all metrics from this stat variable (Python is not compatible with nanoseconds,
-	#  so [:-4] -> microseconds)
+    # the timestamp is the same for all metrics from this stat variable (Python is not compatible with nanoseconds,
+    #  so [:-4] -> microseconds)
 
-	# message to sent to the server API
-	# follow the json schema
-	# sentTime = current time? Or the same timestamp from the metrics?
-	# need to change the probeId, resourceId and messageId
+    # message to sent to the server API
+    # follow the json schema
+    # sentTime = current time? Or the same timestamp from the metrics?
+    # need to change the probeId, resourceId and messageId
 
-	message = Message(probeId=1, resourceId=101098, messageId=0, sentTime=int(time.time()), data=None)
-	line = subprocess.check_output(['tail', '-1', "mylogfile.log"])
-	result = [x.strip() for x in line.split(',')]
-	temp = result[0]
-	count = 0
-	responsetime = 0
+    message = Message(probeId=9, resourceId=15, messageId=0, sentTime=int(time.time()), data=None)
+    line = subprocess.check_output(['tail', '-1', "mylogfile.log"])
+    result = [x.strip() for x in line.split(',')]
+    print result
+    temp = result[0]
+    count = 0
+    responsetime = 0
 
-	while temp == result[0]:
-		responsetime = responsetime + int(result[1])
-		count = count + 1
-		line = subprocess.check_output(['tail', '-1', "mylogfile.log"])
-		result = [x.strip() for x in line.split(',')]
+    while temp == result[0]:
+        responsetime = responsetime + int(result[1])
+        count = count + 1
+        line = subprocess.check_output(['tail', '-1', "mylogfile.log"])
+        result = [x.strip() for x in line.split(',')]
 
-	avgrt = responsetime/count
-	temp = result[0]
+    avgrt = responsetime/count
+    temp = result[0]
 
 
     # Response Time
-	# append measurement data to message
-	dt = Data(type="measurement", descriptionId=1, observations=None)
+    # append measurement data to message
+    dt = Data(type="measurement", descriptionId=29, observations=None)
 
     
-	obs = Observation(time=int(time.time()), value=avgrt)
-	dt.add_observation(observation=obs)
+    obs = Observation(time=int(time.time()), value=avgrt)
+    dt.add_observation(observation=obs)
 
-	# append data to message
-	message.add_data(data=dt)
+    # append data to message
+    message.add_data(data=dt)
 
-	# Throughput
-	# append event data to message
-	dt = Data(type="measurement", descriptionId=2, observations=None)
-	obs = Observation(time=int(time.time()), value=count)
-	dt.add_observation(observation=obs)
+    # Throughput
+    # append event data to message
+    dt = Data(type="measurement", descriptionId=30, observations=None)
+    obs = Observation(time=int(time.time()), value=count)
+    dt.add_observation(observation=obs)
 
-	# append data to message
-	message.add_data(data=dt)
-	# return message formatted in json
-	return json.dumps(message.reprJSON(), cls=ComplexEncoder)
+    # append data to message
+    message.add_data(data=dt)
+    # return message formatted in json
+    return json.dumps(message.reprJSON(), cls=ComplexEncoder)
 
 if __name__ == '__main__':
     # server url as parameter
-    url = str(sys.argv[1] + '')
+#    url = str(sys.argv[0] + '')
+    url = "https://192.168.122.155:32025/monitor"
     communication = Communication(url)
     while 1:
-     message_formated = create_message()
-     response=communication.send_message(message_formated)
-     print (response.text)
+        message_formated = create_message()
+        response=communication.send_message(message_formated)
+        print (response.text)
