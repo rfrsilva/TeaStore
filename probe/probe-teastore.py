@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 import requests
 from tmalibrary.probes import *
-import subprocess
+import os
 
 def create_message(avgrt,count):
     # the timestamp is the same for all metrics from this stat variable (Python is not compatible with nanoseconds,
@@ -45,23 +45,40 @@ if __name__ == '__main__':
     # server url as parameter
     url = "https://192.168.122.155:32025/monitor"
     communication = Communication(url)
+
+    # Open file
+    fo = open("mylogfile.log", "r")
+    fo.seek(-1, os.SEEK_END)
+
+    #Ignore first line
+    buffer = fo.readline()
+    while len(buffer) != 0 or buffer[-1] != '\n':
+    	buffer = fo.readline()
+    
     while 1:
-        line = subprocess.check_output(['tail', '-1', "mylogfile.log"])
-        result = [x.strip() for x in line.split(',')]
-        print result
-        temp = result[0]
+    	line = None
+        buffer = fo.readline()
+        while len(buffer) != 0 or buffer[-1] != '\n':
+        	line = line + buffer
+
+        line = [x.strip() for x in line.split(',')]
+        print line
+        temp = line[0]
         count = 0
         responsetime = 0
 
-        while temp == result[0]:
-          responsetime = responsetime + int(result[1])
-          count = count + 1
-          line = subprocess.check_output(['tail', '-1', "mylogfile.log"])
-          result = [x.strip() for x in line.split(',')]
+        while temp == line[0]:
+            responsetime = responsetime + int(line[1])
+            count = count + 1
+            buffer = fo.readline()
+            line = None
+            while len(buffer) != 0 or buffer[-1] != '\n':
+            	line = line + buffer
+            line = [x.strip() for x in line.split(',')]
 
         avgrt = responsetime/count
-        temp = result[0]
+        temp = line[0]
 
-        message_formated = create_message(avgrt,throughput)
-        response=communication.send_message(message_formated)
+        message_formated = create_message(avgrt,count)
+        response = communication.send_message(message_formated)
         print (response.text)
