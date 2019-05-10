@@ -47,27 +47,28 @@ if __name__ == '__main__':
     communication = Communication(url)
 
     # Open file
-    fo = open("mylogfile.log", "r")
-    fo.seek(-1, os.SEEK_END)
+    file_obj = open("mylogfile.log", "r")
+    file_obj.seek(0, os.SEEK_END) # End-of-file
 
-    #Ignore first line
-    buffer = fo.readline()
-    while len(buffer) != 0 or buffer[-1] != '\n':
-    	buffer = fo.readline()
+
+    # Experiments of 20 minutes
+    stoptime = datetime.datetime.now() + datetime.timedelta(minutes=20)
     
-    while 1:
-    	line = None
-        buffer = fo.readline()
-        while len(buffer) != 0 or buffer[-1] != '\n':
-        	line = line + buffer
+    while datetime.datetime.now() < stoptime:
+    	line = file_obj.readline()
+            if len(line) != 0:
 
-        line = [x.strip() for x in line.split(',')]
-        print line
-        temp = line[0]
-        count = 0
-        responsetime = 0
+                if line[-1] != '\n':
+                    time.sleep(0.1) # Sleep briefly
+                    continue
 
-        while temp == line[0]:
+                line = [x.strip() for x in line.split(',')]
+                print line
+                temp = line[0]
+                count = 0
+                responsetime = 0
+
+                while temp == line[0]:
             responsetime = responsetime + int(line[1])
             count = count + 1
             buffer = fo.readline()
