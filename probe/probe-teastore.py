@@ -56,30 +56,41 @@ if __name__ == '__main__':
     
     while datetime.datetime.now() < stoptime:
     	line = file_obj.readline()
-            if len(line) != 0:
 
-                if line[-1] != '\n':
-                    time.sleep(0.1) # Sleep briefly
-                    continue
+        if len(line) != 0:
 
-                line = [x.strip() for x in line.split(',')]
-                print line
+            if line[-1] != '\n':
+                time.sleep(0.1) # Sleep briefly
+                continue
+
+            line = [x.strip() for x in line.split(',')]
+
+            if len(line) > 2:
+
                 temp = line[0]
                 count = 0
                 responsetime = 0
+                log = line
 
-                while temp == line[0]:
-            responsetime = responsetime + int(line[1])
-            count = count + 1
-            buffer = fo.readline()
-            line = None
-            while len(buffer) != 0 or buffer[-1] != '\n':
-            	line = line + buffer
-            line = [x.strip() for x in line.split(',')]
+                while log[0] <= temp+1000:
 
-        avgrt = responsetime/count
-        temp = line[0]
+                    responsetime = responsetime + int(log[1])
+                    count = count + 1
+                    line = file_obj.readline()
 
-        message_formated = create_message(avgrt,count)
-        response = communication.send_message(message_formated)
-        print (response.text)
+                    if len(line) != 0:
+
+                        if line[-1] != '\n':
+                            time.sleep(0.1) # Sleep briefly
+                            continue
+                        line = [x.strip() for x in line.split(',')]
+
+                        if len(line) > 2:
+                            log=line
+
+                avgrt = responsetime/count
+                temp = log[0]
+
+                message_formated = create_message(avgrt,count)
+                response = communication.send_message(message_formated)
+                print (response.text)
