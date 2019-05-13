@@ -2,7 +2,7 @@ import ast
 import sys
 import json
 import time
-from datetime import datetime
+import datetime
 import requests
 from tmalibrary.probes import *
 import os
@@ -43,7 +43,7 @@ def create_message(avgrt,count):
 
 if __name__ == '__main__':
     # server url as parameter
-    url = "https://192.168.122.155:32025/monitor"
+    url = "https://172.29.249.200:32025/monitor"
     communication = Communication(url)
 
     # Open file
@@ -60,19 +60,21 @@ if __name__ == '__main__':
         if len(line) != 0:
 
             if line[-1] != '\n':
+
                 time.sleep(0.1) # Sleep briefly
                 continue
-
             line = [x.strip() for x in line.split(',')]
 
-            if len(line) > 2:
+            if len(line) == 17 and line[0] != '':
 
                 temp = line[0]
                 count = 0
                 responsetime = 0
                 log = line
+                timestamp = int(temp) + 1000
+                instant = int(log[0])
 
-                while log[0] <= temp+1000:
+                while instant <= timestamp:
 
                     responsetime = responsetime + int(log[1])
                     count = count + 1
@@ -81,16 +83,19 @@ if __name__ == '__main__':
                     if len(line) != 0:
 
                         if line[-1] != '\n':
+
                             time.sleep(0.1) # Sleep briefly
                             continue
                         line = [x.strip() for x in line.split(',')]
 
-                        if len(line) > 2:
-                            log=line
+                        if len(line) == 17 and line[0] != '':
+
+                            log = line
+                            instant = int(log[0])
 
                 avgrt = responsetime/count
                 temp = log[0]
-
                 message_formated = create_message(avgrt,count)
+                print message_formated
                 response = communication.send_message(message_formated)
                 print (response.text)
